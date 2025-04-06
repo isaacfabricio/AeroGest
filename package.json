@@ -1,0 +1,32 @@
+{
+  "dependencies": {
+    "axios": "^1.8.4",
+    "bootstrap": "^5.3.5",
+    "dayjs": "^1.11.13",
+    "dotenv": "^16.4.7",
+    "express": "^5.1.0",
+    "mongoose": "^8.13.2",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "react-router-dom": "^7.5.0",
+    "react-toastify": "^11.0.5"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.26.10",
+    "@babel/preset-react": "^7.26.3",
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.3.0",
+    "@types/react": "^19.1.0",
+    "@types/react-dom": "^19.1.1",
+    "@vitejs/plugin-react": "^4.3.4",
+    "jsdom": "^26.0.0",
+    "package_name": "^1.0.0",
+    "supertest": "^7.1.0",
+    "vitest": "^3.1.1"
+  },
+  "type": "module",
+  "scripts": {
+    "test": "vitest",
+    "start": "node backend/server.js"
+  }
+}
