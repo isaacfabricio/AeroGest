@@ -1,14 +1,35 @@
-# Sistema de Gerenciamento de Voos
+# AeroGest - Sistema de Gerenciamento de Voos
 
-Este é um sistema para gerenciar voos, desenvolvido com Node.js, Express, React e MongoDB.
+## Backend API
 
-## **Configuração**
+### Pré-requisitos
+- Node.js v16+
+- MongoDB
+- NPM
 
-1. Clone o repositório:
-   ```sh
-   git clone <url-do-repositorio>
-   cd sistema-gerenciamento-voos   # Nome do Projeto
-## Instalação
-   
-   ```bash
-   npm install
+### Configuração
+1. Instale as dependências:
+```bash
+cd backend
+npm install
+```
+
+2. Configure o arquivo .env:
+```
+DB_URL=mongodb://localhost:27017/aerogest
+PORT=3001
+```
+
+3. Inicie o servidor:
+```bash
+npm run dev
+```
+
+### Endpoints
+- GET `/flights` - Lista todos os voos
+- POST `/flights` - Cria novo voo
+- PUT `/flights/:id` - Atualiza voo existente
+- DELETE `/flights/:id` - Remove voo
+
+### Desenvolvimento
+O servidor reinicia automaticamente com nodemon durante o desenvolvimento.
