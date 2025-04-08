@@ -8,7 +8,7 @@ const app = express();
 const PORT = process.env.PORT || 3001;
 
 // Conexão com o MongoDB
-mongoose.connect(process.env.DB_URL, { useNewUrlParser: true, useUnifiedTopology: true })
+mongoose.connect(process.env.DB_URL)
   .then(() => console.log('Conectado ao MongoDB'))
   .catch((err) => console.error('Erro ao conectar ao MongoDB:', err));
 
@@ -16,9 +16,21 @@ mongoose.connect(process.env.DB_URL, { useNewUrlParser: true, useUnifiedTopology
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Rota de exemplo
+import { getFlights, createFlight, updateFlight, deleteFlight } from './flightscontrollers.js';
+import cors from 'cors';
+
+// Configura CORS
+app.use(cors());
+
+// Rotas de voos
+app.get('/flights', getFlights);
+app.post('/flights', createFlight);
+app.put('/flights/:id', updateFlight);
+app.delete('/flights/:id', deleteFlight);
+
+// Rota de saúde
 app.get('/', (req, res) => {
-  res.send('Servidor funcionando!');
+  res.send('Servidor de gerenciamento de voos funcionando!');
 });
 
 app.listen(PORT, () => {
