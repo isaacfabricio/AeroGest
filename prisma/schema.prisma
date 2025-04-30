@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AeroGest - Sistema de Gestão Aeroportuária</title>
+  <meta name="description" content="Solução completa para gestão aeroportuária, otimizando operações e melhorando a experiência dos passageiros." />
+  <meta name="keywords" content="AeroGest, gestão aeroportuária, controle de voos, monitoramento, integração, API, aeroporto" />
+  <meta name="author" content="AeroGest Team" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <style>
+    @keyframes float {
+      0%,
+      100% {
+        transform: translateY(0);
+      }
+
+      50% {
+        transform: translateY(-10px);
+      }
+    }
+
+    .floating {
+      animation: float 3s ease-in-out infinite;
+    }
+
+    .gradient-bg {
+      background: linear-gradient(135deg, #1e3a8a 0%, #0284c7 100%);
+    }
+
+    .dashboard-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
+        0 10px 10px -5px rgba(0, 0, 0, 0.1);
+    }
+
+    .glow-on-hover:hover {
+      box-shadow: 0 0 15px rgba(0, 150, 255, 0.5);
+    }
+
+    .slide-in {
+      animation: slideIn 0.5s ease-out forwards;
+    }
+
+    @keyframes slideIn {
+      from {
+        transform: translateX(100px);
+        opacity: 0;
+      }
+
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+  </style>
+</head>
+
+<body class="bg-gray-50 font-sans">
+  <!-- Navigation -->
+  <nav
+    class="gradient-bg text-white shadow-lg sticky top-0 z-50"
+    role="navigation"
+    aria-label="Menu principal"
+  >
+    <div class="container mx-auto px-6 py-4">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center space-x-4">
+          <i class="fas fa-plane-departure text-2xl" aria-hidden="true"></i>
+          <span class="text-xl font-bold">AeroGest</span>
+        </div>
+        <div class="hidden md:flex items-center space-x-8">
+          <a href="#features" class="hover:text-blue-200 transition" tabindex="0">Funcionalidades</a>
+          <a href="#dashboard" class="hover:text-blue-200 transition" tabindex="0">Dashboard</a>
+          <a href="#integrations" class="hover:text-blue-200 transition" tabindex="0">Integrações</a>
+          <a href="#contact" class="hover:text-blue-200 transition" tabindex="0">Contato</a>
+        </div>
+        <div class="md:hidden">
+          <button
+            id="menu-btn"
+            class="text-white focus:outline-none"
+            aria-label="Abrir menu móvel"
+            aria-expanded="false"
+            aria-controls="mobile-menu"
+          >
+            <i class="fas fa-bars text-2xl" aria-hidden="true"></i>
+          </button>
+        </div>
+      </div>
+      <!-- Mobile Menu -->
+      <div id="mobile-menu" class="hidden md:hidden mt-4 pb-4" role="menu" aria-label="Menu móvel">
+        <a href="#features" class="block py-2 hover:text-blue-200 transition" tabindex="0" role="menuitem">Funcionalidades</a>
+        <a href="#dashboard" class="block py-2 hover:text-blue-200 transition" tabindex="0" role="menuitem">Dashboard</a>
+        <a href="#integrations" class="block py-2 hover:text-blue-200 transition" tabindex="0" role="menuitem">Integrações</a>
+        <a href="#contact" class="block py-2 hover:text-blue-200 transition" tabindex="0" role="menuitem">Contato</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <header class="gradient-bg text-white py-20" role="banner">
+    <div class="container mx-auto px-6">
+      <div class="flex flex-col md:flex-row items-center">
+        <div class="md:w-1/2 mb-12 md:mb-0 slide-in">
+          <h1 class="text-4xl md:text-5xl font-bold mb-6">Gestão Aeroportuária Inteligente</h1>
+          <p class="text-xl mb-8 text-blue-100">
+            Otimize operações, melhore a experiência dos passageiros e tome decisões baseadas em dados com o AeroGest.
+          </p>
+          <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
+            <a
+              href="#demo"
+              class="bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition glow-on-hover text-center"
+              role="button"
+              tabindex="0"
+              aria-label="Ver Demonstração"
+              > <i class="fas fa-play-circle mr-2" aria-hidden="true"></i> Ver Demonstração</a
+            >
+            <a
+              href="#contact"
+              class="border-2 border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white hover:text-blue-600 transition text-center"
+              role="button"
+              tabindex="0"
+              aria-label="Solicitar Contato"
+              > <i class="fas fa-envelope mr-2" aria-hidden="true"></i> Solicitar Contato</a
+            >
+          </div>
+        </div>
+        <div class="md:w-1/2 flex justify-center">
+          <div class="relative w-full max-w-md">
+            <div class="absolute -top-10 -left-10 w-32 h-32 bg-blue-300 rounded-full opacity-20"></div>
+            <div class="absolute -bottom-10 -right-10 w-32 h-32 bg-green-300 rounded-full opacity-20"></div>
+            <img
+              src="https://images.unsplash.com/photo-1556388158-158ea5ccacbd?ixlib=rb-4.0.3&amp;ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&amp;auto=format&amp;fit=crop&amp;w=1470&amp;q=80"
+              alt="Aeroporto"
+              class="rounded-xl shadow-2xl relative z-10 floating"
+              loading="lazy"
+              decoding="async"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Features Section -->
+  <section id="features" class="py-20 bg-white" aria-labelledby="features-title">
+    <div class="container mx-auto px-6">
+      <div class="text-center mb-16">
+        <h2 id="features-title" class="text-3xl md:text-4xl font-bold text-gray-800 mb-4">Funcionalidades Implementadas</h2>
+        <div class="w-24 h-1 bg-blue-500 mx-auto"></div>
+        <p class="text-gray-600 mt-4 max-w-2xl mx-auto">
+          Confira as principais melhorias implementadas no sistema AeroGest
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <!-- Feature 1 -->
+        <article
+          class="bg-gray-50 rounded-xl p-8 shadow-md hover:shadow-xl transition dashboard-card"
+          tabindex="0"
+          aria-label="Gestão de Passageiros 2.0"
+        >
+          <div class="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mb-6">
+            <i class="fas fa-users-cog text-blue-500 text-2xl" aria-hidden="true"></i>
+          </div>
+          <h3 class="text-xl font-semibold mb-3">Gestão de Passageiros 2.0</h3>
+          <p class="text-gray-600 mb-4">
+            Sistema completo de check-in, embarque e informações de voo em tempo real com reconhecimento facial integrado.
+          </p>
+          <ul class="space-y-2 text-sm text-gray-500">
+            <li class="flex items-start">
+              <i class="fas fa-check-circle text-green-500 mt-1 mr-2" aria-hidden="true"></i>
+              <span>Integração com sistemas de companhias aéreas</span>
+            </li>
+            <li class="flex items-start">
+              <i class="fas fa-check-circle text-green-500 mt-1 mr-2" aria-hidden="true"></i>
+              <span>Notificações em tempo real para passageiros</span>
+            </li>
+            <li class="flex items-start">
+              <i class="fas fa-check-circle text-green-500 mt-1 mr-2" aria-hidden="true"></i>
+              <span>Relatórios de fluxo de passageiros</span>
+            </li>
+          </ul>
+        </article>
+
+        <!-- Feature 2 -->
+        <article
+          class="bg-gray-50 rounded-xl p-8 shadow-md hover:shadow-xl transition dashboard-card"
+          tabindex="0"
+          aria-label="Sistema de Cargas Inteligente"
+        >
+          <div class="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mb-6">
+            <i class="fas fa-boxes text-green-500 text-2xl" aria-hidden="true"></i>
+          </div>
+          <h3 class="text-xl font-semibold mb-3">Sistema de Cargas Inteligente</h3>
+          <p class="text-gray-600 mb-4">
+            Rastreamento de bagagens e cargas com IoT e blockchain para máxima segurança e transparência.
+          </p>
+          <ul class="space-y-2 text-sm text-gray-500">
+            <li class="flex items-start">
+              <i class="fas fa-check-circle text-green-500 mt-1 mr-2" aria-hidden="true"></i>
+              <span>Sensores RFID para rastreamento em tempo real</span>
+            </li>
+            <li class="flex items-start">
+              <i class="fas fa-check-circle text-green-500 mt-1 mr-2" aria-hidden="true"></i>
+              <span>Histórico completo de movimentações</span>
+            </li>
+            <li class="flex items-start">
+              <i class="fas fa-check-circle text-green-500 mt-1 mr-2" aria-hidden="true"></i>
+              <span>Alertas automáticos para extravios</span>
+            </li>
+          </ul>
+        </article>
+
+        <!-- Feature 3 -->
+        <article
+          class="bg-gray-50 rounded-xl p-8 shadow-md hover:shadow-xl transition dashboard-card"
+          tabindex="0"
+          aria-label="Business Intelligence"
+        >
+          <div class="bg-purple-100 w-16 h-16 rounded-full flex items-center justify-center mb-6">
+            <i class="fas fa-chart-pie text-purple-500 text-2xl" aria-hidden="true"></i>
+          </div>
+          <h3 class="text-xl font-semibold mb-3">Business Intelligence</h3>
+          <p class="text-gray-600 mb-4">
+            Dashboard analítico com machine learning para prever demandas e otimizar recursos.
+          </p>
+          <ul class="space-y-2 text-sm text-gray-500">
+            <li class="flex items-start">
+              <i class="fas fa-check-circle text-green-500 mt-1 mr-2" aria-hidden="true"></i>
+              <span>Previsão de fluxo de passageiros</span>
+            </li>
+            <li class="flex items-start">
+              <i class="fas fa-check-circle text-green-500 mt-1 mr-2" aria-hidden="true"></i>
+              <span>Análise de receitas e custos</span>
+            </li>
+            <li class="flex items-start">
+              <i class="fas fa-check-circle text-green-500 mt-1 mr-2" aria-hidden="true"></i>
+              <span>Relatórios personalizáveis</span>
+            </li>
+          </ul>
+        </article>
+
+        <!-- Feature 4 -->
+        <article
+          class="bg-gray-50 rounded-xl p-8 shadow-md hover:shadow-xl transition dashboard-card"
+          tabindex="0"
+          aria-label="Aplicativo Mobile"
+        >
+          <div class="bg-yellow-100 w-16 h-16 rounded-full flex items-center justify-center mb-6">
+            <i class="fas fa-mobile-alt text-yellow-500 text-2xl" aria-hidden="true"></i>
+          </div>
+          <h3 class="text-xl font-semibold mb-3">Aplicativo Mobile</h3>
+          <p class="text-gray-600 mb-4">
+            Aplicativo PWA para equipes em solo com funcionalidades offline e sincronização automática.
+          </p>
+          <ul class="space-y-2 text-sm text-gray-500">
+            <li class="flex items-start">
+              <i class="fas fa-check-circle text-green-500 mt-1 mr-2" aria-hidden="true"></i>
+              <span>Check-in móvel para equipes</span>
+            </li>
+            <li class="flex items-start">
+              <i class="fas fa-check-circle text-green-500 mt-1 mr-2" aria-hidden="true"></i>
+              <span>Comunicação em tempo real</span>
+            </li>
+            <li class="flex items-start">
+              <i class="fas fa-check-circle text-green-500 mt-1 mr-2" aria-hidden="true"></i>
+              <span>Funcionalidade offline</span>
+            </li>
+          </ul>
+        </article>
+
+        <!-- Feature 5 -->
+        <article
+          class="bg-gray-50 rounded-xl p-8 shadow-md hover:shadow-xl transition dashboard-card"
+          tabindex="0"
+          aria-label="Integrações API"
+        >
+          <div class="bg-red-100 w-16 h-16 rounded-full flex items-center justify-center mb-6">
+            <i class="fas fa-plug text-red-500 text-2xl" aria-hidden="true"></i>
+          </div>
+          <h3 class="text-xl font-semibold mb-3">Integrações API</h3>
+          <p class="text-gray-600 mb-4">
+            Conectores prontos para sistemas de companhias aéreas, controle de tráfego aéreo e serviços meteorológicos.
+          </p>
+          <ul class="space-y-2 text-sm text-gray-500">
+            <li class="flex items-start">
+              <i class="fas fa-check-circle text-green-500 mt-1 mr-2" aria-hidden="true"></i>
+              <span>Padrões IATA/ICAO</span>
+            </li>
+            <li class="flex items-start">
+              <i class="fas fa-check-circle text-green-500 mt-1 mr-2" aria-hidden="true"></i>
+              <span>WebSockets para atualizações</span>
+            </li>
+            <li class="flex items-start">
+              <i class="fas fa-check-circle text-green-500 mt-1 mr-2" aria-hidden="true"></i>
+              <span>Documentação Swagger/OpenAPI</span>
+            </li>
+          </ul>
+        </article>
+
+        <!-- Feature 6 -->
+        <article
+          class="bg-gray-50 rounded-xl p-8 shadow-md hover:shadow-xl transition dashboard-card"
+          tabindex="0"
+          aria-label="Segurança Avançada"
+        >
+          <div class="bg-indigo-100 w-16 h-16 rounded-full flex items-center justify-center mb-6">
+            <i class="fas fa-shield-alt text-indigo-500 text-2xl" aria-hidden="true"></i>
+          </div>
+          <h3 class="text-xl font-semibold mb-3">Segurança Avançada</h3>
+          <p class="text-gray-600 mb-4">
+            Sistema com criptografia de ponta a ponta, autenticação multifator e auditoria completa.
+          </p>
+          <ul class="space-y-2 text-sm text-gray-500">
+            <li class="flex items-start">
+              <i class="fas fa-check-circle text-green-500 mt-1 mr-2" aria-hidden="true"></i>
+              <span>GDPR e LGPD compliant</span>
+            </li>
+            <li class="flex items-start">
+              <i class="fas fa-check-circle text-green-500 mt-1 mr-2" aria-hidden="true"></i>
+              <span>Autenticação biométrica</span>
+            </li>
+            <li class="flex items-start">
+              <i class="fas fa-check-circle text-green-500 mt-1 mr-2" aria-hidden="true"></i>
+              <span>Logs de auditoria detalhados</span>
+            </li>
+          </ul>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- Dashboard Demo -->
+  <section id="dashboard" class="py-20 bg-gray-50" aria-labelledby="dashboard-title">
+    <div class="container mx-auto px-6">
+      <div class="text-center mb-16">
+        <h2 id="dashboard-title" class="text-3xl md:text-4xl font-bold text-gray-800 mb-4">Dashboard de Controle</h2>
+        <div class="w-24 h-1 bg-blue-500 mx-auto"></div>
+        <p class="text-gray-600 mt-4 max-w-2xl mx-auto">Visualização em tempo real das operações aeroportuárias</p>
+      </div>
+
+      <div class="bg-white rounded-xl shadow-xl overflow-hidden">
+        <!-- Dashboard Header -->
+        <div class="bg-gray-800 text-white px-6 py-4 flex items-center justify-between">
+          <div class="flex items-center space-x-4">
+            <i class="fas fa-tachometer-alt" aria-hidden="true"></i>
+            <span class="font-semibold">Painel de Controle AeroGest</span>
+          </div>
+          <div class="text-sm">
+            <span class="bg-green-500 px-2 py-1 rounded">Online</span>
+            <span class="ml-2">Atualizado em tempo real</span>
+          </div>
+        </div>
+
+        <!-- Dashboard Content -->
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 p-6">
+          <!-- Stats Card 1 -->
+          <div class="bg-blue-50 rounded-lg p-6 border-l-4 border-blue-500">
+            <div class="flex justify-between items-start">
+              <div>
+                <p class="text-sm text-blue-800">Passageiros Hoje</p>
+                <p class="text-2xl font-bold text-blue-900">2,458</p>
+              </div>
+              <div class="bg-blue-100 p-2 rounded-full">
+                <i class="fas fa-users text-blue-500" aria-hidden="true"></i>
+              </div>
+            </div>
+            <div class="mt-4">
+              <div class="flex items-center text-sm">
+                <span class="text-green-500 mr-1"><i class="fas fa-caret-up"></i> 12%</span>
+                <span class="text-gray-500">vs ontem</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Stats Card 2 -->
+          <div class="bg-green-50 rounded-lg p-6 border-l-4 border-green-500">
+            <div class="flex justify-between items-start">
+              <div>
+                <p class="text-sm text-green-800">Voos Programados</p>
+                <p class="text-2xl font-bold text-green-900">86</p>
+              </div>
+              <div class="bg-green-100 p-2 rounded-full">
+                <i class="fas fa-plane text-green-500" aria-hidden="true"></i>
+              </div>
+            </div>
+            <div class="mt-4">
+              <div class="flex items-center text-sm">
+                <span class="text-red-500 mr-1"><i class="fas fa-caret-down"></i> 5%</span>
+                <span class="text-gray-500">vs semana passada</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Stats Card 3 -->
+          <div class="bg-purple-50 rounded-lg p-6 border-l-4 border-purple-500">
+            <div class="flex justify-between items-start">
+              <div>
+                <p class="text-sm text-purple-800">Bagagens Processadas</p>
+                <p class="text-2xl font-bold text-purple-900">3,742</p>
+              </div>
+              <div class="bg-purple-100 p-2 rounded-full">
+                <i class="fas fa-suitcase text-purple-500" aria-hidden="true"></i>
+              </div>
+            </div>
+            <div class="mt-4">
+              <div class="flex items-center text-sm">
+                <span class="text-green-500 mr-1"><i class="fas fa-caret-up"></i> 8%</span>
+                <span class="text-gray-500">vs ontem</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Stats Card 4 -->
+          <div class="bg-yellow-50 rounded-lg p-6 border-l-4 border-yellow-500">
+            <div class="flex justify-between items-start">
+              <div>
+                <p class="text-sm text-yellow-800">Ocorrências</p>
+                <p class="text-2xl font-bold text-yellow-900">4</p>
+              </div>
+              <div class="bg-yellow-100 p-2 rounded-full">
+                <i class="fas fa-exclamation-triangle text-yellow-500" aria-hidden="true"></i>
+              </div>
+            </div>
+            <div class="mt-4">
+              <div class="flex items-center text-sm">
+                <span class="text-green-500 mr-1"><i class="fas fa-caret-down"></i> 33%</span>
+                <span class="text-gray-500">vs semana passada</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Charts Section -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 px-6 pb-6">
+          <!-- Flight Status -->
+          <div class="bg-white border rounded-lg p-6 shadow-sm">
+            <h3 class="font-semibold text-gray-800 mb-4">Status de Voos</h3>
+            <div class="space-y-4">
+              <div>
+                <div class="flex justify-between text-sm mb-1">
+                  <span>Partidas</span>
+                  <span class="font-medium">42</span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-2">
+                  <div class="bg-blue-500 h-2 rounded-full" style="width: 85%"></div>
+                </div>
+                <div class="flex justify-between text-xs text-gray-500 mt-1">
+                  <span>No horário</span>
+                  <span>36</span>
+                </div>
+              </div>
+              <div>
+                <div class="flex justify-between text-sm mb-1">
+                  <span>Chegadas</span>
+                  <span class="font-medium">44</span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-2">
+                  <div class="bg-green-500 h-2 rounded-full" style="width: 78%"></div>
+                </div>
+                <div class="flex justify-between text-xs text-gray-500 mt-1">
+                  <span>No horário</span>
+                  <span>34</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Passenger Flow -->
+          <div class="bg-white border rounded-lg p-6 shadow-sm">
+            <h3 class="font-semibold text-gray-800 mb-4">Fluxo de Passageiros</h3>
+            <div class="h-48 flex items-end space-x-2">
+              <div class="flex-1 flex flex-col items-center">
+                <div class="bg-blue-500 w-full rounded-t" style="height: 30%"></div>
+                <span class="text-xs mt-1">00-04</span>
+              </div>
+              <div class="flex-1 flex flex-col items-center">
+                <div class="bg-blue-500 w-full rounded-t" style="height: 10%"></div>
+                <span class="text-xs mt-1">04-08</span>
+              </div>
+              <div class="flex-1 flex flex-col items-center">
+                <div class="bg-blue-500 w-full rounded-t" style="height: 70%"></div>
+                <span class="text-xs mt-1">08-12</span>
+              </div>
+              <div class="flex-1 flex flex-col items-center">
+                <div class="bg-blue-500 w-full rounded-t" style="height: 100%"></div>
+                <span class="text-xs mt-1">12-16</span>
+              </div>
+              <div class="flex-1 flex flex-col items-center">
+                <div class="bg-blue-500 w-full rounded-t" style="height: 80%"></div>
+                <span class="text-xs mt-1">16-20</span>
+              </div>
+              <div class="flex-1 flex flex-col items-center">
+                <div class="bg-blue-500 w-full rounded-t" style="height: 40%"></div>
+                <span class="text-xs mt-1">20-24</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Recent Alerts -->
+          <div class="bg-white border rounded-lg p-6 shadow-sm">
+            <h3 class="font-semibold text-gray-800 mb-4">Alertas Recentes</h3>
+            <div class="space-y-4">
+              <div class="flex items-start">
+                <div class="bg-red-100 p-1 rounded-full mr-3 mt-1">
+                  <i class="fas fa-exclamation-circle text-red-500 text-sm" aria-hidden="true"></i>
+                </div>
+                <div>
+                  <p class="text-sm font-medium">Atraso na decolagem - Voo GLO1903</p>
+                  <p class="text-xs text-gray-500">15 min atrás</p>
+                </div>
+              </div>
+              <div class="flex items-start">
+                <div class="bg-yellow-100 p-1 rounded-full mr-3 mt-1">
+                  <i class="fas fa-exclamation-triangle text-yellow-500 text-sm" aria-hidden="true"></i>
+                </div>
+                <div>
+                  <p class="text-sm font-medium">Bagagem não identificada</p>
+                  <p class="text-xs text-gray-500">32 min atrás</p>
+                </div>
+              </div>
+              <div class="flex items-start">
+                <div class="bg-blue-100 p-1 rounded-full mr-3 mt-1">
+                  <i class="fas fa-info-circle text-blue-500 text-sm" aria-hidden="true"></i>
+                </div>
+                <div>
+                  <p class="text-sm font-medium">Mudança de portão - Voo AZU2045</p>
+                  <p class="text-xs text-gray-500">1 hora atrás</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Flight Board -->
+        <div class="px-6 pb-6">
+          <div class="bg-white border rounded-lg shadow-sm overflow-hidden">
+            <div class="bg-gray-100 px-6 py-3 border-b flex justify-between items-center">
+              <h3 class="font-semibold text-gray-800">Próximos Voos</h3>
+              <div class="flex space-x-2">
+                <button class="text-xs bg-white px-3 py-1 rounded border" aria-pressed="true">Partidas</button>
+                <button class="text-xs bg-blue-500 text-white px-3 py-1 rounded" aria-pressed="false">Chegadas</button>
+              </div>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="min-w-full divide-y divide-gray-200" role="table" aria-label="Tabela de próximos voos">
+                <thead class="bg-gray-50">
+                  <tr>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Voo</th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Destino</th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Horário</th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Portão</th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                  </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                  <tr tabindex="0">
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">GLO1903</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">São Paulo (GRU)</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">14:30</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">B12</td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                      <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Embarque</span>
+                    </td>
+                  </tr>
+                  <tr tabindex="0">
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">AZU2045</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Rio de Janeiro (GIG)</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">15:15</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">A08</td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                      <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">Programado</span>
+                    </td>
+                  </tr>
+                  <tr tabindex="0">
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">TAM3321</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Buenos Aires (EZE)</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">16:00</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">B15</td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                      <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">Check-in</span>
+                    </td>
+                  </tr>
+                  <tr tabindex="0">
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">LAT801</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Miami (MIA)</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">17:30</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">C03</td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                      <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">Aguardando</span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Integrations -->
+  <section id="integrations" class="py-20 bg-white" aria-labelledby="integrations-title">
+    <div class="container mx-auto px-6">
+      <div class="text-center mb-16">
+        <h2 id="integrations-title" class="text-3xl md:text-4xl font-bold text-gray-800 mb-4">Integrações</h2>
+        <div class="w-24 h-1 bg-blue-500 mx-auto"></div>
+        <p class="text-gray-600 mt-4 max-w-2xl mx-auto">
+          Conecte o AeroGest aos principais sistemas do ecossistema aeroportuário
+        </p>
+      </div>
+
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
+        <div
+          class="flex flex-col items-center p-6 border rounded-lg hover:shadow-md transition"
+          tabindex="0"
+          aria-label="Companhias Aéreas"
+        >
+          <div class="bg-blue-50 p-4 rounded-full mb-4">
+            <i class="fas fa-plane text-blue-500 text-2xl" aria-hidden="true"></i>
+          </div>
+          <h3 class="font-semibold text-center">Companhias Aéreas</h3>
+          <p class="text-sm text-gray-500 text-center mt-2">Integração direta com sistemas de reservas</p>
+        </div>
+
+        <div
+          class="flex flex-col items-center p-6 border rounded-lg hover:shadow-md transition"
+          tabindex="0"
+          aria-label="Meteorologia"
+        >
+          <div class="bg-green-50 p-4 rounded-full mb-4">
+            <i class="fas fa-cloud-sun text-green-500 text-2xl" aria-hidden="true"></i>
+          </div>
+          <h3 class="font-semibold text-center">Meteorologia</h3>
+          <p class="text-sm text-gray-500 text-center mt-2">Dados climáticos em tempo real</p>
+        </div>
+
+        <div
+          class="flex flex-col items-center p-6 border rounded-lg hover:shadow-md transition"
+          tabindex="0"
+          aria-label="Controle Aéreo"
+        >
+          <div class="bg-purple-50 p-4 rounded-full mb-4">
+            <i class="fas fa-tower-broadcast text-purple-500 text-2xl" aria-hidden="true"></i>
+          </div>
+          <h3 class="font-semibold text-center">Controle Aéreo</h3>
+          <p class="text-sm text-gray-500 text-center mt-2">Informações de tráfego e pistas</p>
+        </div>
+
+        <div
+          class="flex flex-col items-center p-6 border rounded-lg hover:shadow-md transition"
+          tabindex="0"
+          aria-label="Serviços Terrestres"
+        >
+          <div class="bg-yellow-50 p-4 rounded-full mb-4">
+            <i class="fas fa-taxi text-yellow-500 text-2xl" aria-hidden="true"></i>
+          </div>
+          <h3 class="font-semibold text-center">Serviços Terrestres</h3>
+          <p class="text-sm text-gray-500 text-center mt-2">Catering, limpeza e combustível</p>
+        </div>
+
+        <div
+          class="flex flex-col items-center p-6 border rounded-lg hover:shadow-md transition"
+          tabindex="0"
+          aria-label="Imigração"
+        >
+          <div class="bg-red-50 p-4 rounded-full mb-4">
+            <i class="fas fa-passport text-red-500 text-2xl" aria-hidden="true"></i>
+          </div>
+          <h3 class="font-semibold text-center">Imigração</h3>
+          <p class="text-sm text-gray-500 text-center mt-2">Verificação de documentos</p
