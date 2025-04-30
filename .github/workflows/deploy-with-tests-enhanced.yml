@@ -1,0 +1,53 @@
+name: Deploy com Testes e Notificações
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+env:
+  VERCEL_PROJECT_NAME: ${{ secrets.VERCEL_PROJECT_NAME }}
+  BACKEND_URL: ${{ secrets.BACKEND_URL }}
+  RAILWAY_PROJECT_NAME: ${{ secrets.RAILWAY_PROJECT_NAME }}
+  MONGODB_URL: ${{ secrets.MONGODB_URL }}
+  BACKEND_PORT: ${{ secrets.BACKEND_PORT }}
+  HEROKU_APP_NAME: ${{ secrets.HEROKU_APP_NAME }}
+  DOMAIN_NAME: ${{ secrets.DOMAIN_NAME }}
+  CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
+  CF_ZONE_ID: ${{ secrets.CF_ZONE_ID }}
+  RECORD_NAME: ${{ secrets.RECORD_NAME }}
+  RECORD_CONTENT: ${{ secrets.RECORD_CONTENT }}
+  VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+  RAILWAY_API_TOKEN: ${{ secrets.RAILWAY_API_TOKEN }}
+  RAILWAY_PROJECT_ID: ${{ secrets.RAILWAY_PROJECT_ID }}
+  SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Configurar Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      - name: Instalar dependências
+        run: npm install
+      - name: Executar testes
+        run: npm test
+      - name: Deploy para Vercel
+        run: |
+          npx vercel --prod --confirm --token $VERCEL_TOKEN --scope $VERCEL_PROJECT_NAME
+      - name: Deploy para Railway
+        run: |
+          railway up --project $RAILWAY_PROJECT_NAME --token $RAILWAY_API_TOKEN
+      - name: Notificar Slack em caso de falha
+        if: failure()
+        uses: 8398a7/action-slack@v3
+        with:
+          status: failure
+          fields: repo,message,commit,author,action,eventName,ref,workflow,job,took

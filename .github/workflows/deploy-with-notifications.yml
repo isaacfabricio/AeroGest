@@ -1,0 +1,83 @@
+name: Deploy Pipeline with Notifications
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+
+    - name: Install dependencies (frontend)
+      run: |
+        cd AeroGest/sistema-gerenciamento-voos-frontend
+        npm install
+
+    - name: Run lint
+      run: |
+        cd AeroGest/sistema-gerenciamento-voos-frontend
+        npm run lint
+
+    - name: Run unit tests
+      run: |
+        cd AeroGest/sistema-gerenciamento-voos-frontend
+        npm test
+
+    - name: Run deploy scripts tests
+      run: |
+        bash deploy-scripts/test-deploy-scripts.sh
+
+    - name: Run full deploy
+      env:
+        VERCEL_PROJECT_NAME: ${{ secrets.VERCEL_PROJECT_NAME }}
+        BACKEND_URL: ${{ secrets.BACKEND_URL }}
+        RAILWAY_PROJECT_NAME: ${{ secrets.RAILWAY_PROJECT_NAME }}
+        MONGODB_URL: ${{ secrets.MONGODB_URL }}
+        BACKEND_PORT: ${{ secrets.BACKEND_PORT }}
+        HEROKU_APP_NAME: ${{ secrets.HEROKU_APP_NAME }}
+        DOMAIN_NAME: ${{ secrets.DOMAIN_NAME }}
+        CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
+        CF_ZONE_ID: ${{ secrets.CF_ZONE_ID }}
+        RECORD_NAME: ${{ secrets.RECORD_NAME }}
+        RECORD_CONTENT: ${{ secrets.RECORD_CONTENT }}
+        VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+        RAILWAY_API_TOKEN: ${{ secrets.RAILWAY_API_TOKEN }}
+        RAILWAY_PROJECT_ID: ${{ secrets.RAILWAY_PROJECT_ID }}
+      run: |
+        bash deploy-scripts/full-deploy.sh
+
+    - name: Slack Notification - Success
+      if: success()
+      uses: slackapi/slack-github-action@v1.23.0
+      with:
+        payload: |
+          {
+            "text": "Deploy realizado com sucesso na branch ${{ github.ref }} pelo ${{ github.actor }}."
+          }
+      env:
+        SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+
+    - name: Slack Notification - Failure
+      if: failure()
+      uses: slackapi/slack-github-action@v1.23.0
+      with:
+        payload: |
+          {
+            "text": "Falha no deploy na branch ${{ github.ref }} pelo ${{ github.actor }}. Verifique os logs."
+          }
+      env:
+        SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}

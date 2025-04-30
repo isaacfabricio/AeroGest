@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: aerogest-backend
+    ports:
+      - "3001:3001"
+    environment:
+      - DB_URL=${DB_URL}
+      - PORT=3001
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS}
+    volumes:
+      - ./AeroGest/sistema-unificado/backend:/app
+    depends_on:
+      - mongo
+
+  frontend:
+    build:
+      context: ./AeroGest/sistema-gerenciamento-voos-frontend
+      dockerfile: Dockerfile
+    container_name: aerogest-frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:3001
+    volumes:
+      - ./AeroGest/sistema-gerenciamento-voos-frontend:/app
+    depends_on:
+      - backend
+
+  mongo:
+    image: mongo:6.0
+    container_name: aerogest-mongo
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+
+volumes:
+  mongo-data:

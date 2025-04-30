@@ -1,0 +1,78 @@
+stages:
+  - lint
+  - test
+  - deploy
+  - notify
+
+variables:
+  NODE_VERSION: "18"
+
+before_script:
+  - apt-get update -y
+  - apt-get install -y curl jq mailutils
+  - curl -fsSL https://deb.nodesource.com/setup_18.x | bash -
+  - apt-get install -y nodejs
+  - node -v
+  - npm -v
+
+lint:
+  stage: lint
+  script:
+    - cd AeroGest/sistema-gerenciamento-voos-frontend
+    - npm install
+    - npm run lint
+  only:
+    - main
+
+unit_tests:
+  stage: test
+  script:
+    - cd AeroGest/sistema-gerenciamento-voos-frontend
+    - npm test
+  only:
+    - main
+
+test_scripts:
+  stage: test
+  script:
+    - bash deploy-scripts/test-deploy-scripts.sh
+  only:
+    - main
+
+deploy:
+  stage: deploy
+  script:
+    - bash deploy-scripts/full-deploy.sh
+  only:
+    - main
+  environment:
+    name: production
+  variables:
+    VERCEL_PROJECT_NAME: $VERCEL_PROJECT_NAME
+    BACKEND_URL: $BACKEND_URL
+    RAILWAY_PROJECT_NAME: $RAILWAY_PROJECT_NAME
+    MONGODB_URL: $MONGODB_URL
+    BACKEND_PORT: $BACKEND_PORT
+    HEROKU_APP_NAME: $HEROKU_APP_NAME
+    DOMAIN_NAME: $DOMAIN_NAME
+    CF_API_TOKEN: $CF_API_TOKEN
+    CF_ZONE_ID: $CF_ZONE_ID
+    RECORD_NAME: $RECORD_NAME
+    RECORD_CONTENT: $RECORD_CONTENT
+    VERCEL_TOKEN: $VERCEL_TOKEN
+    VERCEL_PROJECT_ID: $VERCEL_PROJECT_ID
+    RAILWAY_API_TOKEN: $RAILWAY_API_TOKEN
+    RAILWAY_PROJECT_ID: $RAILWAY_PROJECT_ID
+
+notify:
+  stage: notify
+  script:
+    - |
+      if [ "$CI_JOB_STATUS" == "success" ]; then
+        echo "Deploy realizado com sucesso no projeto $CI_PROJECT_NAME" | mail -s "Deploy Sucesso" seu-email@exemplo.com
+      else
+        echo "Falha no deploy no projeto $CI_PROJECT_NAME" | mail -s "Deploy Falhou" seu-email@exemplo.com
+      fi
+  when: always
+  only:
+    - main

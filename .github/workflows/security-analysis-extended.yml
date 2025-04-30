@@ -1,0 +1,82 @@
+name: Security Analysis Extended
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  snyk:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      - name: Install dependencies
+        run: npm install
+      - name: Run Snyk to check vulnerabilities
+        uses: snyk/actions/node@master
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          command: test
+      - name: Upload Snyk report
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: snyk-report
+          path: snyk-report.html
+      - name: Notify on failure
+        if: failure()
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.example.com
+          server_port: 587
+          username: ${{ secrets.SMTP_USERNAME }}
+          password: ${{ secrets.SMTP_PASSWORD }}
+          subject: 'Snyk Vulnerability Alert'
+          to: security-team@example.com
+          from: 'ci-cd@example.com'
+          body: 'Vulnerabilidades foram detectadas no build. Veja o relatório anexado.'
+          attachments: snyk-report.html
+
+  owasp-zap:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      - name: Install dependencies
+        run: npm install
+      - name: Start backend server
+        run: npm run start &
+      - name: Run OWASP ZAP baseline scan
+        uses: zaproxy/action-baseline@v0.7.0
+        with:
+          target: 'http://localhost:3001'
+      - name: Upload OWASP ZAP report
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: owasp-zap-report
+          path: zap_report.html
+      - name: Notify on failure
+        if: failure()
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.example.com
+          server_port: 587
+          username: ${{ secrets.SMTP_USERNAME }}
+          password: ${{ secrets.SMTP_PASSWORD }}
+          subject: 'OWASP ZAP Security Alert'
+          to: security-team@example.com
+          from: 'ci-cd@example.com'
+          body: 'Vulnerabilidades foram detectadas no build. Veja o relatório anexado.'
+          attachments: zap_report.html
