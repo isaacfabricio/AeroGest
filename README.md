@@ -28,6 +28,17 @@ Sistema completo para gestão de operações aeroportuárias, incluindo controle
    npm start
    ```
 
+---
+
+## Observação sobre versões antigas
+
+Este repositório contém algumas pastas e scripts de versões antigas do projeto, como:
+
+- `sistema-gerenciamento-voos-new/`: versão paralela do sistema de gerenciamento de voos.
+- Scripts antigos como `serve-aerogest-old.sh` e `serve-aerogest-old2.sh`.
+
+Recomenda-se avaliar a necessidade dessas versões e arquivos, e arquivá-los ou removê-los para evitar confusão e manter o repositório organizado.
+
 ### Frontend
 1. Navegue até o diretório frontend:
    ```bash

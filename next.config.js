@@ -17,9 +17,9 @@
 const nextConfig = {
   reactStrictMode: true, // Ativa o modo estrito do React para ajudar a identificar problemas
   swcMinify: true,       // Usa o compilador SWC para minificar o código, melhorando a performance
-  // Exemplo de configuração de variáveis de ambiente públicas
+  // Configuração corrigida da variável de ambiente pública para a URL da API
   env: {
-    API_URL: process.env.API_URL || 'http://localhost:3000/api',
+    NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001',
   },
   // Exemplo de configuração de redirecionamento
   async redirects() {

@@ -5,7 +5,9 @@
     "build": "next build",
     "start": "next start",
     "test": "vitest",
-    "dev:all": "concurrently \"npm run dev\" \"npm --prefix AeroGest/sistema-unificado/backend run dev\""
+    "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
+    "dev:all": "concurrently \"npm run dev\" \"npm --prefix AeroGest/sistema-unificado/backend run dev\"",
+    "format": "prettier --write ."
   },
   "dependencies": {
     "@prisma/client": "^6.6.0",
@@ -32,13 +34,14 @@
     "@types/react": "^19.1.0",
     "@types/react-dom": "^19.1.1",
     "@types/testing-library__react": "^10.0.1",
-    "@vitejs/plugin-react": "^4.3.4",
+    "@vitejs/plugin-react": "^4.4.1",
     "concurrently": "^8.2.0",
     "eslint": "^9.25.1",
     "eslint-plugin-react": "^7.37.5",
     "globals": "^16.0.0",
     "jsdom": "^26.0.0",
     "package_name": "^1.0.0",
+    "prettier": "^3.0.0",
     "prisma": "^6.6.0",
     "supertest": "^7.1.0",
     "typescript-eslint": "^8.31.1",
