@@ -1,0 +1,6 @@
+{
+    "python.pythonPath": "/workspaces/codespaces-nextjs/qiskit-py39-env/bin/python",
+    "python.linting.pylintEnabled": true,
+    "python.linting.enabled": true,
+    "git.ignoreLimitWarning": true
+}

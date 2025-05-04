@@ -1,0 +1,67 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+env:
+  IBMQ_TOKEN: ${{ secrets.IBMQ_TOKEN }}
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python-version: [3.8, 3.9, 3.10]
+        os: [ubuntu-latest, windows-latest, macos-latest]
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install dependencies
+      run: |
+        python -m venv venv
+        source venv/bin/activate
+        pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install pylint pytest coverage
+
+    - name: Run backend tests
+      run: |
+        source venv/bin/activate
+        pytest --maxfail=1 --disable-warnings -q --cov=quantum
+
+    - name: Lint code
+      run: |
+        source venv/bin/activate
+        pylint quantum/
+
+    - name: Build frontend (se aplicável)
+      run: |
+        cd AeroGest/sistema-gerenciamento-voos-frontend
+        npm install
+        npm run build
+
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+
+    - name: Deploy to Heroku (exemplo)
+      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+      uses: akhileshns/heroku-deploy@v3.12.12
+      with:
+        heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
+        heroku_app_name: "nome-do-app-heroku"
+        heroku_email: "seu-email@example.com"

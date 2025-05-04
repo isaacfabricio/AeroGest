@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Visualização de Resultados QAOA - AeroGest</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 2rem;
+            background-color: #f9f9f9;
+            color: #2c3e50;
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        label {
+            font-weight: bold;
+            margin-right: 0.5rem;
+        }
+        input[type="number"] {
+            padding: 0.5rem;
+            font-size: 1rem;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            width: 100px;
+        }
+        button {
+            padding: 0.5rem 1rem;
+            font-size: 1rem;
+            background-color: #2980b9;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #3498db;
+        }
+        pre {
+            background: #f4f4f4;
+            padding: 1rem;
+            border-radius: 5px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        #loading {
+            display: none;
+            color: #2980b9;
+            font-style: italic;
+        }
+        #error {
+            color: #c0392b;
+            font-weight: bold;
+            margin-top: 1rem;
+        }
+        canvas {
+            margin-top: 1rem;
+            max-width: 100%;
+        }
+        @media (max-width: 600px) {
+            .container {
+                padding: 0 1rem;
+            }
+            input[type="number"] {
+                width: 80px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Visualização de Resultados QAOA - AeroGest</h1>
+        <div class="form-group">
+            <label for="numAircraft">Número de Aeronaves:</label>
+            <input type="number" id="numAircraft" min="1" max="10" value="3" />
+            <button id="runCircuitBtn">Executar Circuito QAOA</button>
+            <span id="loading">Executando...</span>
+        </div>
+        <h2>Resultados:</h2>
+        <pre id="results">Insira o número de aeronaves e clique no botão para executar.</pre>
+        <canvas id="histogramChart"></canvas>
+        <div id="error"></div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script>
+        // Configura o gráfico de histograma
+        let histogramChart = null;
+        function renderHistogram(counts) {
+            const ctx = document.getElementById('histogramChart').getContext('2d');
+            const labels = Object.keys(counts);
+            const data = Object.values(counts);
+
+            if (histogramChart) {
+                histogramChart.destroy(); // Destroi gráfico anterior
+            }
+
+            histogramChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Contagens',
+                        data: data,
+                        backgroundColor: 'rgba(41, 128, 185, 0.6)',
+                        borderColor: 'rgba(41, 128, 185, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Contagens'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Estados'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+        }
+
+        // Função para buscar alocação otimizada do AeroGest
+        async function fetchOptimizedAllocation(numAircraft) {
+            try {
+                const response = await fetch('http://localhost:8080/api/reservations/optimize', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ num_aircraft: numAircraft })
+                });
+                if (!response.ok) {
+                    throw new Error(`Erro na otimização: ${response.status} - ${response.statusText}`);
+                }
+                return await response.json();
+            } catch (error) {
+                throw new Error(`Falha ao conectar com o backend AeroGest: ${error.message}`);
+            }
+        }
+
+        // Função para executar circuito QAOA
+        async function runQAOAcircuit(numAircraft) {
+            // Exemplo de circuito QAOA serializado (ajustar conforme backend FastAPI)
+            const circuitData = {
+                num_qubits: numAircraft,
+                circuit: {
+                    gates: [
+                        { type: 'h', qubits: [0, 1, 2] },
+                        { type: 'cz', qubits: [0, 1] },
+                        { type: 'cz', qubits: [1, 2] },
+                        { type: 'rx', params: [0.5], qubits: [0, 1, 2] }
+                    ],
+                    measurements: [{ qubits: [0, 1, 2], classical_bits: [0, 1, 2] }]
+                },
+                shots: 1000
+            };
+
+            try {
+                const response = await fetch('http://localhost:8000/run_circuit/', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(circuitData)
+                });
+                if (!response.ok) {
+                    throw new Error(`Erro na execução do circuito: ${response.status} - ${response.statusText}`);
+                }
+                return await response.json();
+            } catch (error) {
+                throw new Error(`Falha ao conectar com o backend FastAPI: ${error.message}`);
+            }
+        }
+
+        // Evento do botão
+        document.getElementById('runCircuitBtn').addEventListener('click', async () => {
+            const numAircraft = parseInt(document.getElementById('numAircraft').value);
+            const resultsEl = document.getElementById('results');
+            const loadingEl = document.getElementById('loading');
+            const errorEl = document.getElementById('error');
+
+            // Validação
+            if (isNaN(numAircraft) || numAircraft < 1 || numAircraft > 10) {
+                errorEl.textContent = 'Por favor, insira um número de aeronaves entre 1 e 10.';
+                return;
+            }
+
+            resultsEl.textContent = '';
+            errorEl.textContent = '';
+            loadingEl.style.display = 'inline';
+
+            try {
+                // Executa circuito QAOA
+                const circuitData = await runQAOAcircuit(numAircraft);
+                // Busca alocação otimizada
+                const optimizedAllocation = await fetchOptimizedAllocation(numAircraft);
+
+                // Exibe resultados
+                resultsEl.textContent = `Resultados do circuito QAOA (IBM Quantum):\n${JSON.stringify(circuitData.counts || {}, null, 2)}\n\nAlocação otimizada pelo agente:\n${JSON.stringify(optimizedAllocation, null, 2)}`;
+
+                // Renderiza histograma
+                if (circuitData.counts) {
+                    renderHistogram(circuitData.counts);
+                } else {
+                    errorEl.textContent = 'Nenhuma contagem retornada pelo circuito.';
+                }
+            } catch (error) {
+                errorEl.textContent = error.message;
+            } finally {
+                loadingEl.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>
