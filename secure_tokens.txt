@@ -1,0 +1,21 @@
+Tokens encontrados no projeto AeroGest:
+
+1. Token IBMQ (presente em quantum/ibmq_setup.py - removido do código por segurança)
+   - Recomenda-se configurar via variável de ambiente IBMQ_TOKEN ou arquivo seguro ignorado pelo git.
+
+2. Token GitHub Actions PAT (referenciado no workflow .github/workflows/azure-deploy.yml como segredo ACTIONS_PAT)
+   - Configure este token no repositório GitHub em Settings > Secrets and variables > Actions.
+
+3. Segredos Azure Web App Publish Profile (referenciados no workflow como AZURE_WEBAPP_PUBLISH_PROFILE_FRONTEND e AZURE_WEBAPP_PUBLISH_PROFILE_BACKEND)
+   - Configure estes segredos no repositório GitHub para deploy seguro no Azure.
+
+4. Segredos Azure Container Registry (referenciados no workflow como AZURE_ACR_USERNAME e AZURE_ACR_PASSWORD)
+   - Configure estes segredos no repositório GitHub para autenticação no Azure Container Registry.
+
+Recomendações:
+- Nunca armazene tokens diretamente no código fonte.
+- Utilize variáveis de ambiente ou arquivos de configuração ignorados pelo git (.gitignore).
+- Revise o histórico git para remover tokens expostos anteriormente.
+- Utilize ferramentas como git-secrets para evitar commits acidentais de tokens.
+
+Este arquivo serve como referência para centralizar a gestão dos tokens e segredos do projeto.
