@@ -3,4 +3,4 @@ qiskit-aer==0.15.0
 qiskit-ibm-runtime==0.30.0
 requests==2.32.0
 matplotlib==3.9.0
-langchain==0.2.0
+langchain==0.2.5
