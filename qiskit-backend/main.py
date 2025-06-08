@@ -1,4 +1,25 @@
-from fastapi import FastAPI, Query, HTTPException, Header, Depends
+from fastapi import FastAPI, Depends, HTTPException
+from sqlalchemy.orm import Session
+from .database import SessionLocal
+from .models import Flight
+from pydantic import BaseModel
+
+class FlightCreate(BaseModel):
+    code: str
+    origin: str
+    destination: str
+
+@app.post("/flights")
+def create_flight(flight: FlightCreate, db: Session = Depends(get_db)):
+    db_flight = Flight(code=flight.code, origin=flight.origin, destination=flight.destination)
+    db.add(db_flight)
+    try:
+        db.commit()
+        db.refresh(db_flight)
+    except Exception:
+        db.rollback()
+        raise HTTPException(status_code=400, detail="Erro ao cadastrar voo (código duplicado?)")
+    return db_flightfrom fastapi import FastAPI, Query, HTTPException, Header, Depends
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 from qiskit import QuantumCircuit, transpile
