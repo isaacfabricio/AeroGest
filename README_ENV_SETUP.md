@@ -12,21 +12,21 @@ python3.9 --version
 
 Se não estiver instalado, instale o Python 3.9 conforme seu sistema operacional.
 
-2. **Crie e ative o ambiente virtual:**
+1. **Crie e ative o ambiente virtual:**
 
 ```bash
 python3.9 -m venv qiskit-env-py39
 source qiskit-env-py39/bin/activate
 ```
 
-3. **Atualize o pip e instale as dependências:**
+1. **Atualize o pip e instale as dependências:**
 
 ```bash
 pip install --upgrade pip
 pip install qiskit==0.43.2 qiskit-algorithms==0.2.0 qiskit-optimization==0.5.0 fastapi uvicorn requests langchain matplotlib python-dotenv
 ```
 
-4. **Configure a variável de ambiente do token IBMQ:**
+1. **Configure a variável de ambiente do token IBMQ:**
 
 No Linux/macOS:
 
@@ -42,11 +42,11 @@ setx IBMQ_TOKEN "seu_token_aqui"
 
 Ou crie o arquivo `.env` na pasta `quantum` com:
 
-```
+```env
 IBMQ_TOKEN=seu_token_aqui
 ```
 
-5. **Execute o backend:**
+1. **Execute o backend:**
 
 ```bash
 uvicorn quantum.backend_api:app --host 0.0.0.0 --port 8000 --reload
