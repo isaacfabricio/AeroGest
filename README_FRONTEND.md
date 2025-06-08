@@ -37,13 +37,13 @@ O frontend do AeroGest é construído com Next.js (React) e utiliza as seguintes
 npm install
 ```
 
-2. Inicie o servidor de desenvolvimento:
+1. Inicie o servidor de desenvolvimento:
 
 ```bash
 npm run dev
 ```
 
-3. Acesse a aplicação em `http://localhost:3000`.
+1. Acesse a aplicação em `http://localhost:3000`.
 
 ## Testes
 

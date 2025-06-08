@@ -4,6 +4,15 @@ from .database import SessionLocal
 from .models import Flight
 from pydantic import BaseModel
 
+app = FastAPI()
+
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
 class FlightCreate(BaseModel):
     code: str
     origin: str
@@ -19,7 +28,9 @@ def create_flight(flight: FlightCreate, db: Session = Depends(get_db)):
     except Exception:
         db.rollback()
         raise HTTPException(status_code=400, detail="Erro ao cadastrar voo (código duplicado?)")
-    return db_flightfrom fastapi import FastAPI, Query, HTTPException, Header, Depends
+    return db_flight
+
+from fastapi import FastAPI, Query, HTTPException, Header, Depends
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 from qiskit import QuantumCircuit, transpile
