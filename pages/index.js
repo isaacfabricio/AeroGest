@@ -292,4 +292,394 @@ export default function Home() {
       <History history={history} />
     </div>
   );
+}import { useEffect, useState } from "react";
+import {
+  Container, Card, CardContent, Typography, Button, Box, Grid, TextField, Snackbar, Alert, AppBar, Toolbar, IconButton, Tabs, Tab
+} from "@mui/material";
+import FlightTakeoffIcon from "@mui/icons-material/FlightTakeoff";
+import DeleteIcon from "@mui/icons-material/Delete";
+import EditIcon from "@mui/icons-material/Edit";
+import CloudIcon from "@mui/icons-material/Cloud";
+import PeopleIcon from "@mui/icons-material/People";
+import AirplanemodeActiveIcon from "@mui/icons-material/AirplanemodeActive";
+
+function WeatherInfo({ destination }) {
+  const [weather, setWeather] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (!destination) return;
+    setLoading(true);
+    fetch(`https://api.open-meteo.com/v1/forecast?latitude=-23.55&longitude=-46.63&current_weather=true`)
+      .then(res => res.json())
+      .then(data => {
+        setWeather(data.current_weather);
+        setLoading(false);
+      });
+  }, [destination]);
+
+  if (!destination) return null;
+  if (loading) return <Typography color="primary">Carregando clima para {destination}...</Typography>;
+  if (!weather) return <Typography color="error">Clima não disponível.</Typography>;
+
+  return (
+    <Box mt={2} mb={2}>
+      <Alert icon={<CloudIcon />} severity="info">
+        <strong>Clima em {destination}:</strong> {weather.temperature}°C, código: {weather.weathercode}
+      </Alert>
+    </Box>
+  );
+}
+
+function GenericForm({ title, fields, initialData, onSubmit, onCancel }) {
+  const [form, setForm] = useState(initialData || {});
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    setForm(initialData || {});
+  }, [initialData]);
+
+  const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    await onSubmit(form);
+    setLoading(false);
+    setForm({});
+  };
+
+  return (
+    <Card sx={{ mb: 3 }}>
+      <CardContent>
+        <Typography variant="h6" color="primary" gutterBottom>
+          {title}
+        </Typography>
+        <Box component="form" onSubmit={handleSubmit} sx={{ display: "flex", gap: 2, flexWrap: "wrap" }}>
+          {fields.map(f => (
+            <TextField
+              key={f.name}
+              label={f.label}
+              name={f.name}
+              value={form[f.name] || ""}
+              onChange={handleChange}
+              required={f.required}
+            />
+          ))}
+          <Button type="submit" variant="contained" color="primary" disabled={loading}>
+            {loading ? "Salvando..." : (initialData ? "Salvar edição" : "Cadastrar")}
+          </Button>
+          {onCancel && (
+            <Button variant="outlined" color="secondary" onClick={onCancel}>
+              Cancelar
+            </Button>
+          )}
+        </Box>
+      </CardContent>
+    </Card>
+  );
+}
+
+export default function Home() {
+  // Tabs: 0 = Voos, 1 = Passageiros, 2 = Aeronaves
+  const [tab, setTab] = useState(0);
+
+  // Voos
+  const [flights, setFlights] = useState([]);
+  const [editingFlight, setEditingFlight] = useState(null);
+  const [selectedDestination, setSelectedDestination] = useState("");
+
+  // Passageiros e aeronaves (em memória)
+  const [passengers, setPassengers] = useState([]);
+  const [editingPassenger, setEditingPassenger] = useState(null);
+  const [aircrafts, setAircrafts] = useState([]);
+  const [editingAircraft, setEditingAircraft] = useState(null);
+
+  // Feedback visual
+  const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" });
+
+  // --- Funções de voo (backend) ---
+  const fetchFlights = () => {
+    fetch("http://localhost:8000/flights")
+      .then((res) => res.json())
+      .then((data) => setFlights(data));
+  };
+
+  useEffect(() => {
+    fetchFlights();
+  }, []);
+
+  const showSnackbar = (message, severity = "success") => {
+    setSnackbar({ open: true, message, severity });
+  };
+
+  // Voos
+  const handleAddFlight = async (flight) => {
+    const res = await fetch("http://localhost:8000/flights", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(flight),
+    });
+    if (!res.ok) return showSnackbar("Erro ao cadastrar voo", "error");
+    fetchFlights();
+    showSnackbar("Voo cadastrado com sucesso!");
+  };
+
+  const handleEditFlight = async (flight) => {
+    const res = await fetch(`http://localhost:8000/flights/${editingFlight.id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(flight),
+    });
+    if (!res.ok) return showSnackbar("Erro ao editar voo", "error");
+    fetchFlights();
+    showSnackbar("Voo editado com sucesso!");
+    setEditingFlight(null);
+  };
+
+  const handleDeleteFlight = async (flight) => {
+    if (!window.confirm(`Deseja excluir o voo ${flight.code}?`)) return;
+    const res = await fetch(`http://localhost:8000/flights/${flight.id}`, {
+      method: "DELETE",
+    });
+    if (!res.ok) return showSnackbar("Erro ao excluir voo", "error");
+    fetchFlights();
+    showSnackbar("Voo excluído com sucesso!");
+  };
+
+  // Passageiros (em memória)
+  const handleAddPassenger = async (p) => {
+    setPassengers((prev) => [...prev, { ...p, id: Date.now() }]);
+    showSnackbar("Passageiro cadastrado com sucesso!");
+  };
+  const handleEditPassenger = async (p) => {
+    setPassengers((prev) =>
+      prev.map((item) => (item.id === editingPassenger.id ? { ...item, ...p } : item))
+    );
+    showSnackbar("Passageiro editado com sucesso!");
+    setEditingPassenger(null);
+  };
+  const handleDeletePassenger = async (p) => {
+    if (!window.confirm(`Deseja excluir o passageiro ${p.name}?`)) return;
+    setPassengers((prev) => prev.filter((item) => item.id !== p.id));
+    showSnackbar("Passageiro excluído com sucesso!");
+  };
+
+  // Aeronaves (em memória)
+  const handleAddAircraft = async (a) => {
+    setAircrafts((prev) => [...prev, { ...a, id: Date.now() }]);
+    showSnackbar("Aeronave cadastrada com sucesso!");
+  };
+  const handleEditAircraft = async (a) => {
+    setAircrafts((prev) =>
+      prev.map((item) => (item.id === editingAircraft.id ? { ...item, ...a } : item))
+    );
+    showSnackbar("Aeronave editada com sucesso!");
+    setEditingAircraft(null);
+  };
+  const handleDeleteAircraft = async (a) => {
+    if (!window.confirm(`Deseja excluir a aeronave ${a.model}?`)) return;
+    setAircrafts((prev) => prev.filter((item) => item.id !== a.id));
+    showSnackbar("Aeronave excluída com sucesso!");
+  };
+
+  return (
+    <>
+      <AppBar position="static">
+        <Toolbar>
+          <FlightTakeoffIcon sx={{ mr: 2 }} />
+          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+            AeroGest - Dashboard
+          </Typography>
+        </Toolbar>
+      </AppBar>
+      <Container maxWidth="md" sx={{ mt: 4 }}>
+        <Tabs value={tab} onChange={(_, v) => setTab(v)} centered sx={{ mb: 3 }}>
+          <Tab icon={<FlightTakeoffIcon />} label="Voos" />
+          <Tab icon={<PeopleIcon />} label="Passageiros" />
+          <Tab icon={<AirplanemodeActiveIcon />} label="Aeronaves" />
+        </Tabs>
+
+        {/* Voos */}
+        {tab === 0 && (
+          <>
+            <FlightForm
+              onSubmit={editingFlight ? handleEditFlight : handleAddFlight}
+              initialData={editingFlight}
+              onCancel={editingFlight ? () => setEditingFlight(null) : undefined}
+            />
+            <Typography variant="h5" color="primary" gutterBottom>
+              Lista de Voos
+            </Typography>
+            <Grid container spacing={2}>
+              {flights.map((flight) => (
+                <Grid item xs={12} sm={6} md={4} key={flight.id}>
+                  <Card>
+                    <CardContent>
+                      <Typography variant="h6" color="text.secondary">
+                        {flight.code}
+                      </Typography>
+                      <Typography>
+                        {flight.origin} <FlightTakeoffIcon fontSize="small" /> {flight.destination}
+                      </Typography>
+                      <Box sx={{ mt: 1, display: "flex", gap: 1 }}>
+                        <Button
+                          size="small"
+                          variant="outlined"
+                          startIcon={<CloudIcon />}
+                          onClick={() => setSelectedDestination(flight.destination)}
+                        >
+                          Clima
+                        </Button>
+                        <Button
+                          size="small"
+                          variant="outlined"
+                          startIcon={<EditIcon />}
+                          onClick={() => setEditingFlight(flight)}
+                        >
+                          Editar
+                        </Button>
+                        <Button
+                          size="small"
+                          variant="outlined"
+                          color="error"
+                          startIcon={<DeleteIcon />}
+                          onClick={() => handleDeleteFlight(flight)}
+                        >
+                          Excluir
+                        </Button>
+                      </Box>
+                    </CardContent>
+                  </Card>
+                </Grid>
+              ))}
+            </Grid>
+            <WeatherInfo destination={selectedDestination} />
+          </>
+        )}
+
+        {/* Passageiros */}
+        {tab === 1 && (
+          <>
+            <GenericForm
+              title={editingPassenger ? "Editar passageiro" : "Cadastrar passageiro"}
+              fields={[
+                { name: "name", label: "Nome", required: true },
+                { name: "document", label: "Documento", required: true },
+              ]}
+              initialData={editingPassenger}
+              onSubmit={editingPassenger ? handleEditPassenger : handleAddPassenger}
+              onCancel={editingPassenger ? () => setEditingPassenger(null) : undefined}
+            />
+            <Typography variant="h5" color="primary" gutterBottom>
+              Lista de Passageiros
+            </Typography>
+            <Grid container spacing={2}>
+              {passengers.map((p) => (
+                <Grid item xs={12} sm={6} md={4} key={p.id}>
+                  <Card>
+                    <CardContent>
+                      <Typography variant="h6" color="text.secondary">
+                        {p.name}
+                      </Typography>
+                      <Typography>
+                        Documento: {p.document}
+                      </Typography>
+                      <Box sx={{ mt: 1, display: "flex", gap: 1 }}>
+                        <Button
+                          size="small"
+                          variant="outlined"
+                          startIcon={<EditIcon />}
+                          onClick={() => setEditingPassenger(p)}
+                        >
+                          Editar
+                        </Button>
+                        <Button
+                          size="small"
+                          variant="outlined"
+                          color="error"
+                          startIcon={<DeleteIcon />}
+                          onClick={() => handleDeletePassenger(p)}
+                        >
+                          Excluir
+                        </Button>
+                      </Box>
+                    </CardContent>
+                  </Card>
+                </Grid>
+              ))}
+            </Grid>
+          </>
+        )}
+
+        {/* Aeronaves */}
+        {tab === 2 && (
+          <>
+            <GenericForm
+              title={editingAircraft ? "Editar aeronave" : "Cadastrar aeronave"}
+              fields={[
+                { name: "model", label: "Modelo", required: true },
+                { name: "registration", label: "Matrícula", required: true },
+              ]}
+              initialData={editingAircraft}
+              onSubmit={editingAircraft ? handleEditAircraft : handleAddAircraft}
+              onCancel={editingAircraft ? () => setEditingAircraft(null) : undefined}
+            />
+            <Typography variant="h5" color="primary" gutterBottom>
+              Lista de Aeronaves
+            </Typography>
+            <Grid container spacing={2}>
+              {aircrafts.map((a) => (
+                <Grid item xs={12} sm={6} md={4} key={a.id}>
+                  <Card>
+                    <CardContent>
+                      <Typography variant="h6" color="text.secondary">
+                        {a.model}
+                      </Typography>
+                      <Typography>
+                        Matrícula: {a.registration}
+                      </Typography>
+                      <Box sx={{ mt: 1, display: "flex", gap: 1 }}>
+                        <Button
+                          size="small"
+                          variant="outlined"
+                          startIcon={<EditIcon />}
+                          onClick={() => setEditingAircraft(a)}
+                        >
+                          Editar
+                        </Button>
+                        <Button
+                          size="small"
+                          variant="outlined"
+                          color="error"
+                          startIcon={<DeleteIcon />}
+                          onClick={() => handleDeleteAircraft(a)}
+                        >
+                          Excluir
+                        </Button>
+                      </Box>
+                    </CardContent>
+                  </Card>
+                </Grid>
+              ))}
+            </Grid>
+          </>
+        )}
+
+        <Snackbar
+          open={snackbar.open}
+          autoHideDuration={3000}
+          onClose={() => setSnackbar({ ...snackbar, open: false })}
+        >
+          <Alert
+            onClose={() => setSnackbar({ ...snackbar, open: false })}
+            severity={snackbar.severity}
+            sx={{ width: "100%" }}
+          >
+            {snackbar.message}
+          </Alert>
+        </Snackbar>
+      </Container>
+    </>
+  );
 }
