@@ -34,4 +34,4 @@ pytest test
 
 ## Configuração IBM Quantum
 
-Para usar hardware real, obtenha seu token em https://quantum-computing.ibm.com e envie no header `ibmq-token`.
+Para usar hardware real, obtenha seu token em [https://quantum-computing.ibm.com](https://quantum-computing.ibm.com) e envie no header `ibmq-token`.
